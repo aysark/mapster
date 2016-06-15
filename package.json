@@ -1,0 +1,27 @@
+{
+  "name": "mapster",
+  "version": "1.0.0",
+  "description": "Bring maps to slack!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aysark/mapster.git"
+  },
+  "keywords": [
+    "mapster",
+    "slack",
+    "bot"
+  ],
+  "author": "Aysar K",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aysark/mapster/issues"
+  },
+  "homepage": "https://github.com/aysark/mapster#readme",
+  "dependencies": {
+    "botkit": "^0.2.0"
+  }
+}
