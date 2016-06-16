@@ -8,10 +8,7 @@ if (!process.env.gmaps_token) {
   process.exit(1);
 }
 
-var gmaps_token = process.env.gmaps_token;
 var Botkit = require('botkit');
-var mapsWebApi = require(__dirname + '/maps_client.js');
-
 var controller = Botkit.slackbot({
   debug:true
 });
@@ -24,24 +21,47 @@ bot.startRTM(function(err, bot, payload) {
   }
 });
 
+var mwa = require(__dirname + '/maps_web_api.js');
+var mapsWebApi = mwa({
+  token: process.env.gmaps_token
+})
+
 
 controller.on(['bot_channel_join','bot_group_join'], function(bot, message) {
-  var reply_with_attachments = {
-    'text': 'Good day lads.  I\'m Mapster, i map stuff.  Just say: `@mapster map {location}`',
-    'attachments': [
-      {
-        'fallback': 'To be useful, I need you to invite me to a channel.',
-        'title': 'How can I help you?',
-        'image_url': 'https://maps.googleapis.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY&zoom=13&size=600x300&maptype=roadmap&markers=color:blue%7Clabel:S%7C40.702147,-74.015794&markers=color:green%7Clabel:G%7C40.711614,-74.012318&markers=color:red%7Clabel:C%7C40.718217,-73.998284&key='+gmaps_token,
-        'color': '#7CD197'
-      }
-    ]
-  };
-  bot.reply(message, reply_with_attachments)
+  bot.reply(message, 'Good day lads.  I\'m Mapster, i map stuff.  Just say: `@mapster map {location}`')
 });
 
 controller.hears('map (.*)', 'direct_message,direct_mention,mention', function(bot, message) {
-    // validate
+    var locationStr = message.match[1];
+    // validate, should be >= 6 alphanumeric chars
     // geocode
-    // reply
+    mapsWebApi.commands.geocode({
+      address:locationStr
+    }, function(err, res) {
+      if (!err) {
+        console.log('Geocode command response: '+res);
+        // fetch image
+        mapsWebApi.commands.map({
+          center:locationStr, zoom:13, size:"400x500", maptype:"roadmap"
+        }, function(err, res) {
+          if (!err) {
+            console.log('Map command response: '+res);
+            var reply_with_attachments = {
+              'attachments': [
+                {
+                  'fallback': 'To be useful, I need you to invite me to a channel.',
+                  'title': locationStr,
+                  'image_url': 'http://i.imgur.com/vboStCi.png' //res
+                }
+              ]
+            };
+            bot.reply(message, reply_with_attachments);
+          } else {
+              console.log('Map command error: ' + err);
+          }
+        });
+      } else {
+        console.log('Geocode command error: ' + err);
+      }
+    });
 });

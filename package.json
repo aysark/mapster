@@ -2,7 +2,7 @@
   "name": "mapster",
   "version": "1.0.0",
   "description": "Bring maps to slack!",
-  "main": "index.js",
+  "main": "mapster_slock_bot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
