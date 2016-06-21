@@ -12,8 +12,6 @@ module.exports = function(config) {
       console.log('**API CALL: ' + api_url + qs.stringify(options));
       request.head(api_url + qs.stringify(options), function(error, resp, body) {
         if (!error && resp.statusCode == 200) {
-          console.log('content-type:', resp.headers['content-type']);
-          console.log('content-length:', resp.headers['content-length']);
 
           if (!options.maptype) {
             var filename = 'streetview' + (new Date()).getTime() + '.png';
@@ -21,7 +19,9 @@ module.exports = function(config) {
             var filename = 'map' + (new Date()).getTime() + '.png';
           }
           request(api_url + qs.stringify(options)).pipe(fs.createWriteStream(filename))
-            .on('close', cb(null, filename));
+            .on('close', function() {
+              cb(null, filename);
+            });
         } else {
           if (cb) cb(error || 'Invalid Response');
         }
